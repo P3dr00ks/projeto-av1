@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f6f2">
+  <title>Catálogo — Vitrine</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#"><span class="brand-mark">v.</span><span>vitrine<span class="brand-dot">.</span></span></a>
+    <div class="top-actions"><span class="connection"><i></i><span id="connection-label">Modo demonstração</span></span><button class="icon-button" id="settings-open" aria-label="Configurar API" title="Configurar API">⚙</button></div>
+  </header>
+  <main>
+    <section class="hero"><div><p class="eyebrow">CATÁLOGO DE PRODUTOS</p><h1>Feito para<br><em>encontrar o seu.</em></h1><p class="hero-copy">Uma seleção de boas ideias, pronta para explorar.</p></div><div class="hero-art" aria-hidden="true"><div class="sun"></div><div class="arch"></div><div class="plant">✳</div></div></section>
+    <section class="toolbar"><div class="results"><span id="result-count">0 produtos</span><span class="tiny-divider">/</span><span id="collection-label">coleção</span></div><div class="tools"><label class="search"><span>⌕</span><input id="search" placeholder="Buscar produtos" type="search"></label><button class="button primary" id="add-open"><span>＋</span> Novo produto</button></div></section>
+    <section id="product-grid" class="product-grid" aria-live="polite"></section>
+    <section id="empty-state" class="empty-state" hidden><div class="empty-icon">◌</div><h2>Nenhum produto por aqui</h2><p>Adicione o primeiro item ou tente outra busca.</p><button class="button primary" id="empty-add">＋ Novo produto</button></section>
+  </main>
+  <footer><span>VITRINE <b>·</b> PROJETO DE SISTEMAS DISTRIBUÍDOS</span><span id="footer-mode">Dados salvos neste navegador</span></footer>
+
+  <dialog id="product-dialog">
+    <form id="product-form" method="dialog">
+      <div class="dialog-head"><div><p class="eyebrow" id="form-eyebrow">NOVO ITEM</p><h2 id="form-title">Adicionar produto</h2></div><button type="button" class="close" data-close="product-dialog" aria-label="Fechar">×</button></div>
+      <input type="hidden" id="product-id">
+      <label class="field">Título<input id="title" required maxlength="90" placeholder="Ex.: Luminária Aurora"></label>
+      <label class="field">Descrição<textarea id="description" required maxlength="400" rows="4" placeholder="Conte o que torna este produto especial..."></textarea></label>
+      <label class="field">Preço (R$)<input id="price" required type="number" min="0.01" step="0.01" placeholder="0,00"></label>
+      <div class="form-error" id="form-error" role="alert"></div>
+      <div class="dialog-actions"><button type="button" class="button ghost" data-close="product-dialog">Cancelar</button><button class="button primary" id="save-product">Salvar produto</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="settings-dialog">
+    <form id="settings-form" method="dialog">
+      <div class="dialog-head"><div><p class="eyebrow">CONEXÃO</p><h2>Configurar API REST</h2></div><button type="button" class="close" data-close="settings-dialog" aria-label="Fechar">×</button></div>
+      <p class="settings-note">A Vitrine é um cliente web; os dados ficam no banco NoSQL atendido pelo serviço REST. Escolha o recurso da API Technoworks e informe os caminhos definidos na documentação.</p>
+      <label class="field">Recurso da API<select id="api-mode"><option value="functions">Functions — itens titulo, descricao, preco</option><option value="rest">REST — coleção livre</option><option value="easy">Easy — somente GET</option></select></label>
+      <label class="field">URL base<input id="api-base" type="url" placeholder="https://seu-servidor/api"></label>
+      <label class="field">RA do aluno (REST/Easy)<input id="api-ra" inputmode="numeric" placeholder="Necessário somente em REST e Easy"></label>
+      <label class="field">Caminho da coleção<input id="api-collection" placeholder="Automático: /api/items, /rest/{ra} ou /easy/get/{ra}"></label>
+      <label class="field">Caminho para criar (opcional)<input id="api-create" placeholder="Vazio usa a rota padrão do modo escolhido"></label>
+      <label class="field">Caminho para atualizar (opcional)<input id="api-update" placeholder="Vazio usa a rota padrão; {id} é o ID"></label>
+      <label class="field">Caminho para excluir (opcional)<input id="api-delete" placeholder="Vazio usa a rota padrão; {id} é o ID"></label>
+      <label class="field">Autorização (opcional)<input id="api-token" type="password" autocomplete="off" placeholder="Bearer token"></label>
+      <div class="settings-note" id="mode-help">Functions usa /api/items e os campos titulo, descricao e preco. REST e Easy usam RA; Easy usa somente GET, inclusive nas operações de escrita. A API deve aceitar CORS para a origem desta aplicação.</div>
+      <div class="dialog-actions"><button type="button" class="button ghost" id="local-mode">Usar demonstração local</button><button class="button primary">Salvar conexão</button></div>
+    </form>
+  </dialog>
+  <div class="toast" id="toast" role="status"></div>
+  <script src="api-config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
