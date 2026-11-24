@@ -28,7 +28,7 @@ function productImage(product){if(product.imagem)return product.imagem;const tit
 [/headset|fone gamer/,'https://www.firstshop.co.za/cdn/shop/files/tbs-3101-05-gaming-headsets-1149797295.jpg?v=1742414360'],
 [/teclado|keyboard/,'https://elitehubs.com/cdn/shop/files/Redragon-Mitra-K551-104-Wired-Mechanical-Keyboard-Rgb-Black-Blue-Switch.jpg?v=1685622701&width=533'],
 [/mouse/,'https://images4.kabum.com.br/produtos/fotos/100724/mouse-gamer-havit-rgb-7-botoes-7200dpi-hv-ms1001_1552314713_gg.jpg'],
-[/dualsense|midnight black|controle/,'https://resources.sanborns.com.mx/imagenes-sanborns-ii/1200/711719574309.jpg'],
+[/dualsense|midnight black|controle/,'https://www.costco.com.mx/medias/sys_master/products/h4b/h3d/398628244652062.jpg'],
 [/funko|master chief/,'https://images.stockx.com/images/Funko-Pop-Games-Halo-Universe-Master-Chief-Figure-01.jpg?auto=format%2Ccompress&bg=FFFFFF&dpr=2&fit=fill&h=500&q=90&trim=color&updated_at=1620337461&w=700'],
 [/nintendo|switch oled|switch/,'https://images2.kabum.com.br/produtos/fotos/385192/console-nintendo-switch-oled-com-joy-con-branco-hbgskaaa2_1663593562_gg.jpg'],
 [/xbox|series x/,'https://cdn.awsli.com.br/800x800/948/948792/produto/71168363/1-9ogq92ybgu.jpg'],
