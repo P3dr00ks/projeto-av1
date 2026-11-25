@@ -1,61 +1,134 @@
-const STORE_KEY = 'vitrine.products.v1';
-const API_KEY = 'vitrine.api.v1';
-const colors = ['#e7eee5','#f3e9db','#e8e9f1','#f3e5e1','#e3eceb','#f0eadf'];
-const symbols = ['◉','✳','◒','⌂','◇','❋','◈','☼'];
-const starter = [
-  {id:'VT-1024',titulo:'Luminária Aurora',descricao:'Luz suave e formas orgânicas para desacelerar o fim do dia.',preco:289.9},
-  {id:'VT-1025',titulo:'Vaso Horizonte',descricao:'Cerâmica artesanal com acabamento fosco e presença tranquila.',preco:164.0},
-  {id:'VT-1026',titulo:'Cadeira Sabiá',descricao:'Madeira de origem responsável, linhas leves e conforto diário.',preco:890.0},
-  {id:'VT-1027',titulo:'Mesa Ninho',descricao:'Uma peça versátil para reunir café, livros e boas conversas.',preco:1240.0},
-  {id:'VT-1028',titulo:'Copo Maré',descricao:'Vidro soprado com pequenas variações que tornam cada peça única.',preco:78.5},
-  {id:'VT-1029',titulo:'Pôster Jardim',descricao:'Impressão em papel de algodão para trazer um pouco de natureza.',preco:96.0}
-];
-let products = readProducts();
-let config = readConfig();
-const $ = id => document.getElementById(id);
-const productDialog = $('product-dialog');
-const settingsDialog = $('settings-dialog');
+(() => {
+  'use strict';
+  const Core = window.VitrineCore;
+  const STORE_KEY = 'vitrine.products.v2';
+  const API_KEY = 'vitrine.api.v2';
+  const colors = ['#e7eee5','#f3e9db','#e8e9f1','#f3e5e1','#e3eceb','#f0eadf'];
+  const starter = [
+    {id:'k7c4DjYL3MxM5Q9U2ZB1',titulo:'Monitor 24 Polegadas',descricao:'Full HD IPS 75Hz HDMI',preco:749.00},
+    {id:'FPfmb1afhwfNMUw1wkBn',titulo:'Headset Gamer',descricao:'Som estéreo com microfone ajustável',preco:179.90},
+    {id:'qpENYZ1gA4o9eM0XPYVc',titulo:'Teclado Mecânico',descricao:'Switch red ABNT2 retroiluminado',preco:249.90},
+    {id:'SEzB0TO80jBsIthcurIG',titulo:'Mouse Gamer',descricao:'Sem fio 2.4GHz',preco:199.90},
+    {id:'UZceyxXLYLLl9gUJPf77',titulo:'Controle DualSense Midnight Black',descricao:'PlayStation 5 - Sem fio, lacrado na caixa.',preco:449.90},
+    {id:'VJvU4C9X1OL314xrlK20',titulo:'Funko Pop! Master Chief',descricao:'Boneco colecionável de vinil do Master Chief, série Halo. Aproximadamente 10 cm.',preco:149.90},
+    {id:'cG7yYhfgqlj96hj3zrQq',titulo:'Nintendo Switch OLED Branco',descricao:'Console híbrido com tela OLED de 7 polegadas, 64GB e Joy-Con brancos.',preco:2299},
+    {id:'1J9mwGtV1gtchEomueoF',titulo:'Console Xbox Series X 1TB',descricao:'Console Xbox Series X com SSD de 1TB, 4K a 120 fps e controle sem fio incluso.',preco:4199},
+    {id:'7UhGKyr0p31DQQL1olCK',titulo:'Console PlayStation 5 Slim 1TB',descricao:'Console PS5 Slim com leitor de disco, SSD de 1TB e controle DualSense incluso.',preco:3799},
+    {id:'mNAKP5xwC0tewVG9qieG',titulo:'The Legend of Zelda: Tears of the Kingdom',descricao:'Aventura em mundo aberto pelas ilhas do céu de Hyrule. Mídia física, lacrado.',preco:349.90}
+  ];
+  const $ = id => document.getElementById(id);
+  const cloneStarter = () => starter.map(item => ({...item}));
+  const readJson = (key, fallback) => { try { const value=JSON.parse(localStorage.getItem(key)); return value ?? fallback; } catch { return fallback; } };
+  let products = readJson(STORE_KEY, cloneStarter());
+  let config = readJson(API_KEY, window.VITRINE_CONFIG);
+  let connected = false;
+  let busy = false;
+  const productDialog = $('product-dialog');
+  const settingsDialog = $('settings-dialog');
 
-function readProducts(){try{const value=JSON.parse(localStorage.getItem(STORE_KEY));return Array.isArray(value)?value:structuredClone(starter)}catch{return structuredClone(starter)}}
-function readConfig(){try{return JSON.parse(localStorage.getItem(API_KEY))||window.VITRINE_CONFIG||null}catch{return window.VITRINE_CONFIG||null}}
-function persistLocal(){localStorage.setItem(STORE_KEY,JSON.stringify(products))}
-function escapeHtml(value=''){return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function idFor(product){return String(product.id ?? product._id ?? product.ID ?? 'sem-id')}
-function normalize(item){return {id:idFor(item),titulo:item.titulo??item.title??'',descricao:item.descricao??item.description??'',preco:Number(item.preco??item.price??0),imagem:item.imagem??item.image??item.imageUrl??''}}
-function formatPrice(value){return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(value)||0)}
-function productImage(product){if(product.imagem)return product.imagem;const title=String(product.titulo||'').toLocaleLowerCase('pt-BR');const matches=[
-[/monitor|24\\s*pol|polegadas/,'https://d3gqasl9vmjfd8.cloudfront.net/1fbc8c36-41bf-433e-b07b-8a21f78cd1d1.jpg'],
-[/headset|fone gamer/,'https://www.firstshop.co.za/cdn/shop/files/tbs-3101-05-gaming-headsets-1149797295.jpg?v=1742414360'],
-[/teclado|keyboard/,'https://elitehubs.com/cdn/shop/files/Redragon-Mitra-K551-104-Wired-Mechanical-Keyboard-Rgb-Black-Blue-Switch.jpg?v=1685622701&width=533'],
-[/mouse/,'https://images4.kabum.com.br/produtos/fotos/100724/mouse-gamer-havit-rgb-7-botoes-7200dpi-hv-ms1001_1552314713_gg.jpg'],
-[/dualsense|midnight black|controle/,'https://www.costco.com.mx/medias/sys_master/products/h4b/h3d/398628244652062.jpg'],
-[/funko|master chief/,'https://images.stockx.com/images/Funko-Pop-Games-Halo-Universe-Master-Chief-Figure-01.jpg?auto=format%2Ccompress&bg=FFFFFF&dpr=2&fit=fill&h=500&q=90&trim=color&updated_at=1620337461&w=700'],
-[/nintendo|switch oled|switch/,'https://images2.kabum.com.br/produtos/fotos/385192/console-nintendo-switch-oled-com-joy-con-branco-hbgskaaa2_1663593562_gg.jpg'],
-[/xbox|series x/,'https://cdn.awsli.com.br/800x800/948/948792/produto/71168363/1-9ogq92ybgu.jpg'],
-[/playstation|ps5|slim/,'https://intercompras.com/images/product/SONY_4948872415934.jpg'],
-[/zelda|tears of the kingdom/,'https://cdn.awsli.com.br/600x1000/2595/2595093/produto/237971202/1-99874-ebjihm92d5.png']
-];return matches.find(([pattern])=>pattern.test(title))?.[1]||''}
-function productImageMarkup(product){const src=productImage(product);return src?`<img class="product-image" src="${escapeHtml(src)}" alt="${escapeHtml(product.titulo)}" loading="lazy" onerror="this.remove()">`:''}
-function isReadOnly(){return false}
-function render(){const query=$('search').value.trim().toLocaleLowerCase('pt-BR');const visible=products.filter(p=>`${p.titulo} ${p.descricao} ${p.id}`.toLocaleLowerCase('pt-BR').includes(query));$('result-count').textContent=`${visible.length} ${visible.length===1?'produto':'produtos'}`;$('collection-label').textContent=config?.mode==='functions'?'Functions':config?.mode==='rest'?'REST':config?.mode==='easy'?'Easy · somente leitura':'coleção';$('add-open').hidden=isReadOnly();$('empty-add').hidden=isReadOnly();$('product-grid').innerHTML=visible.map((p,i)=>`<article class="card"><div class="card-art" style="background:${colors[i%colors.length]}"><span class="card-id">ID · ${escapeHtml(p.id)}</span>${productImageMarkup(p)}</div><div class="card-body"><h3>${escapeHtml(p.titulo)}</h3><p>${escapeHtml(p.descricao)}</p><div class="card-bottom"><span class="price">${formatPrice(p.preco)}</span>${isReadOnly()?'':`<div class="card-actions"><button class="small-action" data-edit="${escapeHtml(p.id)}">Editar</button><button class="small-action" data-delete="${escapeHtml(p.id)}">Excluir</button></div>`}</div></div></article>`).join('');$('empty-state').hidden=visible.length>0;$('product-grid').hidden=visible.length===0}
-function notify(message){const toast=$('toast');toast.textContent=message;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2600)}
-function endpoint(path){return `${config.base.replace(/\/$/,'')}/${path.replace(/^\//,'')}`}
-function routePath(kind,id=''){const mode=config?.mode||'functions';const ra=encodeURIComponent(config?.ra||'');const standard=['/api/items','/rest/{ra}','/easy/get/{ra}'];const defaultCollection=mode==='rest'?'/rest/{ra}':mode==='easy'?'/easy/get/{ra}':'/api/items';const configured=config?.collection;const collection=configured&&!standard.includes(configured)?configured:defaultCollection;const defaults=mode==='functions'?{create:collection,update:`${collection}/{id}`,delete:`${collection}/{id}`} : mode==='rest'?{create:'/rest/{ra}',update:'/rest/{ra}/{id}',delete:'/rest/{ra}/{id}'}:{create:'/easy/post/{ra}',update:'/easy/put/{ra}/{id}',delete:'/easy/delete/{ra}/{id}'};let path=kind==='list'?collection:(config?.[kind]||defaults[kind]);return path.replaceAll('{ra}',ra).replaceAll('{id}',encodeURIComponent(id))}
-function queryUrl(path,fields){const url=new URL(endpoint(path));for(const [key,value] of Object.entries(fields))url.searchParams.set(key,String(value));return url.toString()}
-function headers(){return {'Accept':'application/json','Content-Type':'application/json',...(config.token?{Authorization:config.token.startsWith('Bearer ')?config.token:`Bearer ${config.token}`}:{})}}
-async function apiRequest(url,options={}){const response=await fetch(url,{...options,headers:{...headers(),...options.headers}});if(!response.ok)throw new Error(`API respondeu ${response.status}`);if(response.status===204)return null;const text=await response.text();return text?JSON.parse(text):null}
-async function loadFromApi(){if(!config?.base)return;if(config.mode!=='functions'&&!config?.ra){setMode(false);notify('Informe o RA para conectar nos modos REST e Easy.');return}try{const data=await apiRequest(endpoint(routePath('list')));const rows=Array.isArray(data)?data:(data?.dados??data?.data??data?.items??data?.results??[]);if(!Array.isArray(rows))throw new Error('Formato de resposta inválido');products=rows.map(normalize);persistLocal();setMode(true);render()}catch(error){setMode(false);notify(`Não foi possível carregar a API: ${error.message}`)}}
-function setMode(connected){const label=$('connection-label');label.textContent=connected?`API REST · ${(config?.mode||'').toUpperCase()}`:'Modo demonstração';label.parentElement.classList.toggle('connected',connected);$('footer-mode').textContent=connected?`Banco NoSQL via API REST (${config.mode})`:'Dados de demonstração neste navegador'}
-function openNew(){if(isReadOnly())return;$('product-form').reset();$('product-id').value='';$('form-title').textContent='Adicionar produto';$('form-eyebrow').textContent='NOVO ITEM';$('form-error').textContent='';productDialog.showModal()}
-function openEdit(id){if(isReadOnly())return;const p=products.find(x=>x.id===id);if(!p)return;$('product-id').value=p.id;$('title').value=p.titulo;$('description').value=p.descricao;$('price').value=p.preco;$('form-title').textContent='Editar produto';$('form-eyebrow').textContent=`ID · ${p.id}`;$('form-error').textContent='';productDialog.showModal()}
-async function saveProduct(event){event.preventDefault();const oldId=$('product-id').value;const current={titulo:$('title').value.trim(),descricao:$('description').value.trim(),preco:Number($('price').value)};if(!current.titulo||!current.descricao||current.preco<=0){$('form-error').textContent='Preencha todos os campos com valores válidos.';return}try{if(config?.base){if(config.mode!=='functions'&&!config?.ra)throw new Error('Informe o RA em Configurar API.');if(config.mode==='easy'){const path=routePath(oldId?'update':'create',oldId);await apiRequest(queryUrl(path,current),{method:'GET'})}else if(oldId){await apiRequest(endpoint(routePath('update',oldId)),{method:'PUT',body:JSON.stringify(current)})}else{await apiRequest(endpoint(routePath('create')),{method:'POST',body:JSON.stringify(current)})}await loadFromApi();notify('Produto salvo na API.')}else{if(oldId){products=products.map(p=>p.id===oldId?{...current,id:oldId}:p)}else{current.id=`VT-${Date.now().toString().slice(-8)}`;products.unshift(current)}persistLocal();render();notify(oldId?'Produto atualizado.':'Produto adicionado.')}productDialog.close()}catch(error){$('form-error').textContent=`Falha ao salvar: ${error.message}`}}
-async function deleteProduct(id){if(!confirm(`Excluir o produto ${id}?`))return;try{if(config?.base){if(config.mode!=='functions'&&!config?.ra)throw new Error('Informe o RA em Configurar API.');const method=config.mode==='easy'?'GET':'DELETE';await apiRequest(endpoint(routePath('delete',id)),{method});await loadFromApi()}else{products=products.filter(p=>p.id!==id);persistLocal();render()}notify('Produto excluído.')}catch(error){notify(`Falha ao excluir: ${error.message}`)}}
-function openSettings(){ $('api-mode').value=config?.mode||'functions';$('api-base').value=config?.base||'';$('api-ra').value=config?.ra||'';$('api-collection').value=config?.collection||'';$('api-create').value=config?.create||'';$('api-update').value=config?.update||'';$('api-delete').value=config?.delete||'';$('api-token').value=config?.token||'';updateModeHelp();settingsDialog.showModal() }
-function updateModeHelp(){const mode=$('api-mode').value;$('mode-help').textContent=mode==='functions'?'Functions usa /api/items: GET/POST na coleção e GET/PUT/PATCH/DELETE por ID. O catálogo envia titulo, descricao e preco; a resposta traz os itens em dados.':mode==='rest'?'REST usa /rest/{ra} e os métodos HTTP normais. Informe o RA. Os campos do catálogo são armazenados como coleção livre, e a resposta traz os itens em dados.':'Easy executa todas as operações somente por GET: /easy/get, /easy/post, /easy/put e /easy/delete. Informe o RA; criação e edição enviam titulo, descricao e preco pela query string.'}
-$('search').addEventListener('input',render);$('add-open').addEventListener('click',openNew);$('empty-add').addEventListener('click',openNew);$('settings-open').addEventListener('click',openSettings);$('product-form').addEventListener('submit',saveProduct);
-$('product-grid').addEventListener('click',event=>{const edit=event.target.closest('[data-edit]');const del=event.target.closest('[data-delete]');if(edit)openEdit(edit.dataset.edit);if(del)deleteProduct(del.dataset.delete)});
-document.querySelectorAll('[data-close]').forEach(button=>button.addEventListener('click',()=>$(button.dataset.close).close()));
-$('api-mode').addEventListener('change',updateModeHelp);
-$('settings-form').addEventListener('submit',async event=>{event.preventDefault();const mode=$('api-mode').value;const base=$('api-base').value.trim();const ra=$('api-ra').value.trim();if(!base){notify('Informe a URL base da API.');return}if(mode!=='functions'&&!ra){notify('Informe o RA para usar REST ou Easy.');return}config={mode,base,ra,collection:$('api-collection').value.trim(),create:$('api-create').value.trim(),update:$('api-update').value.trim(),delete:$('api-delete').value.trim(),token:$('api-token').value.trim()};localStorage.setItem(API_KEY,JSON.stringify(config));settingsDialog.close();await loadFromApi();render()});
-$('local-mode').addEventListener('click',()=>{config={mode:'local'};localStorage.setItem(API_KEY,JSON.stringify(config));products=readProducts();setMode(false);render();settingsDialog.close();notify('Demonstração local ativada neste navegador.')});
-render();if(config?.base&&config?.collection)loadFromApi();else setMode(false);
+  function imageFor(product){ return Core.productImage(product, window.VITRINE_IMAGES); }
+  function render(){
+    const visible=Core.filterProducts(products,$('search').value);
+    $('result-count').textContent=`${visible.length} ${visible.length===1?'produto':'produtos'}`;
+    $('collection-label').textContent=config?.mode==='functions'?'Functions':config?.mode==='rest'?'REST':config?.mode==='easy'?'Easy · GET':'demonstração';
+    $('product-grid').innerHTML=visible.map((p,i)=>{
+      const src=imageFor(p);
+      return `<article class="card"><div class="card-art" style="background:${colors[i%colors.length]}"><span class="card-id">ID · ${Core.escapeHtml(p.id)}</span>${src?`<img class="product-image" src="${Core.escapeHtml(src)}" alt="${Core.escapeHtml(p.titulo)}" loading="lazy">`:''}</div><div class="card-body"><h3>${Core.escapeHtml(p.titulo)}</h3><p>${Core.escapeHtml(p.descricao)}</p><div class="card-bottom"><span class="price">${Core.formatPrice(p.preco)}</span><div class="card-actions"><button type="button" class="small-action" data-edit="${Core.escapeHtml(p.id)}">Editar</button><button type="button" class="small-action" data-delete="${Core.escapeHtml(p.id)}">Excluir</button></div></div></div></article>`;
+    }).join('');
+    $('empty-state').hidden=visible.length>0;$('product-grid').hidden=visible.length===0;
+    $('add-open').disabled=busy;$('empty-add').disabled=busy;
+  }
+  function notify(message){const toast=$('toast');toast.textContent=message;toast.classList.add('show');window.setTimeout(()=>toast.classList.remove('show'),3600)}
+  function setConnection(state,label){
+    connected=state;const pill=$('connection-label');
+    pill.textContent=label;pill.parentElement.classList.toggle('connected',state);
+    $('footer-mode').textContent=state?`Dados compartilhados · API Technoworks REST · RA ${config.ra}`:label;
+  }
+  function persist(){try{localStorage.setItem(STORE_KEY,JSON.stringify(products))}catch{}}
+  async function apiRequest(kind,id='',product={}){
+    const plan=Core.requestPlan(config,kind,id,product);
+    const controller=new AbortController();const timer=window.setTimeout(()=>controller.abort(),12000);
+    try{
+      const headers={Accept:'application/json'};
+      if(plan.body!==undefined)headers['Content-Type']='application/json';
+      if(config.token)headers.Authorization=config.token.startsWith('Bearer ')?config.token:`Bearer ${config.token}`;
+      const response=await fetch(plan.url,{method:plan.method,headers,body:plan.body,signal:controller.signal});
+      if(!response.ok){let detail='';try{detail=(await response.text()).slice(0,180)}catch{}throw new Error(`API respondeu HTTP ${response.status}${detail?`: ${detail}`:''}`)}
+      if(response.status===204)return null;
+      const text=await response.text();return text?JSON.parse(text):null;
+    }catch(error){if(error.name==='AbortError')throw new Error('A API demorou mais de 12 segundos para responder.');if(error instanceof SyntaxError)throw new Error('A API retornou uma resposta que não é JSON válido.');throw error}
+    finally{window.clearTimeout(timer)}
+  }
+  async function loadFromApi({quiet=false}={}){
+    try{
+      const payload=await apiRequest('list');products=Core.unwrapProducts(payload);persist();setConnection(true,`API ${config.mode.toUpperCase()} conectada`);render();return true;
+    }catch(error){
+      setConnection(false,`API indisponível · ${error.message}`);
+      if(!quiet)notify(`Não foi possível carregar o catálogo compartilhado: ${error.message}`);
+      render();return false;
+    }
+  }
+  function openNew(){
+    $('product-form').reset();$('product-id').value='';$('form-title').textContent='Adicionar produto';$('form-eyebrow').textContent='NOVO ITEM';$('form-error').textContent='';productDialog.showModal();
+  }
+  function openEdit(id){
+    const p=products.find(item=>item.id===id);if(!p)return;
+    $('product-id').value=p.id;$('title').value=p.titulo;$('description').value=p.descricao;$('price').value=p.preco;$('image-url').value=p.imagem||imageFor(p);
+    $('form-title').textContent='Editar produto';$('form-eyebrow').textContent=`ID · ${p.id}`;$('form-error').textContent='';productDialog.showModal();
+  }
+  async function saveProduct(event){
+    event.preventDefault();
+    const id=$('product-id').value;
+    const current={titulo:$('title').value.trim(),descricao:$('description').value.trim(),preco:Number($('price').value),imagem:$('image-url').value.trim()};
+    const error=Core.validateProduct(current);if(error){$('form-error').textContent=error;return}
+    busy=true;$('save-product').disabled=true;$('save-product').textContent='Salvando…';
+    try{
+      if(config.mode==='local'){
+        if(id)products=products.map(p=>p.id===id?{...current,id}:p);else products.unshift({...current,id:`LOCAL-${Date.now()}`});
+        persist();render();notify('Produto salvo neste navegador.');
+      }else{
+        await apiRequest(id?'update':'create',id,current);
+        const ok=await loadFromApi({quiet:true});if(!ok)throw new Error('A gravação foi enviada, mas não consegui atualizar a lista. Recarregue a página.');
+        notify(config.mode==='functions'&&current.imagem?'Produto salvo. A API Functions não armazena imagem; use REST para persistir a foto.':'Produto salvo na coleção compartilhada.');
+      }
+      productDialog.close();
+    }catch(error){$('form-error').textContent=`Falha ao salvar: ${error.message}`}
+    finally{busy=false;$('save-product').disabled=false;$('save-product').textContent='Salvar produto';render()}
+  }
+  async function deleteProduct(id){
+    const item=products.find(p=>p.id===id);if(!item||!window.confirm(`Excluir “${item.titulo}” (ID ${id})?`))return;
+    try{
+      if(config.mode==='local'){products=products.filter(p=>p.id!==id);persist();render()}
+      else{await apiRequest('delete',id);if(!await loadFromApi({quiet:true}))throw new Error('Exclusão enviada, mas a lista não pôde ser atualizada.')}
+      notify('Produto excluído.');
+    }catch(error){notify(`Falha ao excluir: ${error.message}`)}
+  }
+  function openSettings(){
+    $('api-mode').value=config.mode||'rest';$('api-base').value=config.base||'';$('api-ra').value=config.ra||'';
+    $('api-collection').value=config.collection||'';$('api-create').value=config.create||'';$('api-update').value=config.update||'';$('api-delete').value=config.delete||'';
+    $('api-token').value=config.token||'';updateModeHelp();settingsDialog.showModal();
+  }
+  function updateModeHelp(){
+    const mode=$('api-mode').value;
+    $('mode-help').textContent=mode==='functions'?'Functions usa /api/items e aceita titulo, descricao e preco. Imagens não são persistidas nesse recurso.':mode==='rest'?'REST salva os campos livres no banco NoSQL, incluindo a URL HTTPS da imagem. O ID é gerado pela API e usado em alterações e exclusões.':'Easy aceita somente GET, inclusive para operações de gravação. A API precisa suportar os campos enviados pela query string.';
+  }
+  $('search').addEventListener('input',render);
+  $('add-open').addEventListener('click',openNew);$('empty-add').addEventListener('click',openNew);
+  $('settings-open').addEventListener('click',openSettings);$('product-form').addEventListener('submit',saveProduct);
+  $('product-grid').addEventListener('click',event=>{const edit=event.target.closest('[data-edit]');const del=event.target.closest('[data-delete]');if(edit)openEdit(edit.dataset.edit);if(del)deleteProduct(del.dataset.delete)});
+  document.querySelectorAll('[data-close]').forEach(button=>button.addEventListener('click',()=>$(button.dataset.close).close()));
+  $('api-mode').addEventListener('change',updateModeHelp);
+  $('settings-form').addEventListener('submit',async event=>{
+    event.preventDefault();const mode=$('api-mode').value,base=$('api-base').value.trim(),ra=$('api-ra').value.trim();
+    if(!base){notify('Informe a URL base da API.');return}
+    if(mode!=='functions'&&mode!=='local'&&!ra){notify('Informe o RA para usar REST ou Easy.');return}
+    const next={mode,base,ra,collection:$('api-collection').value.trim(),create:$('api-create').value.trim(),update:$('api-update').value.trim(),delete:$('api-delete').value.trim(),token:$('api-token').value.trim()};
+    try{Core.requestPlan(next,'list');config=next;localStorage.setItem(API_KEY,JSON.stringify(config));settingsDialog.close();await loadFromApi()}
+    catch(error){notify(error.message)}
+  });
+  $('local-mode').addEventListener('click',()=>{
+    config={mode:'local'};try{localStorage.setItem(API_KEY,JSON.stringify(config))}catch{}
+    products=readJson(STORE_KEY,cloneStarter());setConnection(false,'Demonstração local · dados só neste navegador');render();settingsDialog.close();
+  });
+  render();setConnection(false,'Conectando à coleção compartilhada…');loadFromApi({quiet:true});
+})();
