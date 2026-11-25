@@ -144,5 +144,7 @@
     config={mode:'local'};try{localStorage.setItem(API_KEY,JSON.stringify(config))}catch{}
     products=readJson(STORE_KEY,cloneStarter());setConnection(false,'Demonstração local · dados só neste navegador');render();settingsDialog.close();
   });
-  render();setConnection(false,'Conectando à coleção compartilhada…');loadFromApi({quiet:true});
+  render();
+  if(config?.mode==='local')setConnection(false,'Demonstração local · dados só neste navegador');
+  else{setConnection(false,'Conectando à coleção compartilhada…');loadFromApi({quiet:true});}
 })();
