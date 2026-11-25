@@ -27,6 +27,7 @@
       <label class="field">Título<input id="title" required maxlength="90" placeholder="Ex.: Luminária Aurora"></label>
       <label class="field">Descrição<textarea id="description" required maxlength="400" rows="4" placeholder="Conte o que torna este produto especial..."></textarea></label>
       <label class="field">Preço (R$)<input id="price" required type="number" min="0.01" step="0.01" placeholder="0,00"></label>
+      <label class="field">URL da imagem (HTTPS)<input id="image-url" type="url" placeholder="https://.../produto.jpg"></label>
       <div class="form-error" id="form-error" role="alert"></div>
       <div class="dialog-actions"><button type="button" class="button ghost" data-close="product-dialog">Cancelar</button><button class="button primary" id="save-product">Salvar produto</button></div>
     </form>
@@ -49,7 +50,9 @@
     </form>
   </dialog>
   <div class="toast" id="toast" role="status"></div>
-  <script src="api-config.js"></script>
-  <script src="app.js?v=products-2"></script>
+  <script src="api-config.js?v=rest-v3"></script>
+  <script src="catalog-core.js?v=rest-v3"></script>
+  <script src="catalog-images.js?v=rest-v3"></script>
+  <script src="app.js?v=rest-v3"></script>
 </body>
 </html>
