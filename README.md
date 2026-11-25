@@ -1,46 +1,52 @@
-# Vitrine — sistema distribuído de catálogo
+# Vitrine — catálogo web distribuído
 
-Catálogo web responsivo com HTML, CSS e JavaScript. O front-end é hospedado no GitHub Pages e usa REST/JSON para acessar o banco NoSQL atendido pela API Technoworks.
+Catálogo web responsivo com HTML, CSS e JavaScript. O GitHub Pages hospeda o front-end; a API Technoworks fornece acesso REST/JSON ao banco NoSQL.
 
-## Requisitos cobertos
+## Requisitos do projeto
 
 | Requisito | Implementação |
 | --- | --- |
-| Web Service multiplataforma | Site estático servido por HTTPS para navegadores em computadores, celulares e diferentes sistemas operacionais. |
-| Front-end livre | HTML, CSS e JavaScript sem instalação de dependências. |
-| Banco NoSQL | Banco remoto acessado somente pela API. |
-| REST + JSON | Requisições `fetch` com JSON nos modos Functions e REST; modo Easy usa os endpoints GET documentados. |
-| Technoworks | Seletor Functions, REST e Easy com rotas padrão da documentação. |
-| ID | O ID do servidor aparece no cartão e serve para endereçar atualizações e exclusões. |
-| Vibe coding | O front-end pode ser editado ou expandido com Lovable, Google AI Studio ou ferramenta similar. |
+| Web Service multiplataforma | Site HTTPS acessível por navegador em computadores, celulares e diferentes sistemas operacionais. |
+| Front-end livre | HTML, CSS e JavaScript sem instalação no cliente. |
+| Banco NoSQL | Dados persistidos no banco remoto atrás da API Technoworks. |
+| REST + JSON | Requisições HTTPS com JSON usando `fetch`. |
+| Technoworks | Configuração para Functions, REST e Easy, conforme as capacidades documentadas. |
+| IDs | A interface mostra o ID retornado pelo servidor e o usa para editar e excluir registros. |
+| Vibe coding | O projeto pode ser editado por Lovable, Google AI Studio ou ferramentas similares. |
 
-## Usar
+## Catálogo publicado
 
-Abra `index.html` em um navegador. Por padrão, o site usa a API Functions em `https://technoworks.com.br/api/items`, permitindo que diferentes dispositivos consultem os mesmos produtos. Se a API estiver indisponível, a interface informa o erro; o botão de demonstração usa dados locais daquele navegador.
+A conexão inicial usa a coleção REST do RA `3023100294`, cuja publicação no código público foi autorizada pelo responsável. Os dez produtos do catálogo foram gravados nessa coleção com ID gerado pelo servidor: monitor, headset, teclado, mouse, controle DualSense, Funko Master Chief, Nintendo Switch OLED, Xbox Series X, PlayStation 5 Slim e Zelda: Tears of the Kingdom.
 
-O catálogo permite buscar, cadastrar, editar e excluir itens. A API Functions espera os campos `titulo`, `descricao` e `preco`, e devolve os registros dentro de `dados`, cada um com um `id`.
+Cada registro REST contém título, descrição, preço, URL HTTPS da imagem e a referência ao ID anterior. O navegador consulta o catálogo compartilhado ao abrir o site. É possível buscar, cadastrar, editar e excluir itens. Essas operações alteram a coleção compartilhada para todos os visitantes.
+
+As imagens são URLs de fontes externas. O banco guarda o endereço da imagem, não o arquivo; se a fonte externa remover a foto, será necessário atualizar a URL. Para novos registros, prefira HTTPS.
 
 ## Modos da API
 
-- **Functions:** `GET/POST /api/items`; atualizações e exclusões usam `/api/items/{id}` com os métodos HTTP correspondentes.
-- **REST:** `GET/POST /rest/{ra}` e `GET/PUT/PATCH/DELETE /rest/{ra}/{id}`. Informe o RA na configuração local do navegador.
-- **Easy:** somente GET: `/easy/get/{ra}`, `/easy/post/{ra}`, `/easy/put/{ra}/{id}` e `/easy/delete/{ra}/{id}`. Criação e edição enviam os campos pela query string. Informe o RA na configuração local.
+- **REST (padrão):** `GET/POST /rest/{ra}` e `GET/PUT/PATCH/DELETE /rest/{ra}/{id}`. Persiste título, descrição, preço e imagem.
+- **Functions:** usa `/api/items` e os campos `titulo`, `descricao`, `preco`. Esse recurso não persiste o campo imagem.
+- **Easy:** somente GET, inclusive operações de escrita quando suportadas pela API; envia parâmetros pela query string.
 
-O cliente aceita listas no campo `dados` ou listas JSON diretas; reconhece IDs em `id`, `_id` ou `ID`. O modo REST e o Easy requerem RA. As configurações feitas pela engrenagem são armazenadas no navegador atual. A configuração compartilhada inicial fica em `api-config.js`; não coloque senhas nem tokens privados nesse arquivo, pois o repositório e o código carregado pelo navegador são públicos.
+A interface valida campos e URL de imagem, exige IDs na leitura, aplica timeout, descreve erros HTTP e interpreta respostas JSON antes de atualizar a tela. As preferências locais de conexão ficam no navegador. O token opcional é salvo apenas no armazenamento do navegador em uso; nunca publique segredos no repositório.
 
-## Publicar no GitHub Pages
+## Executar e publicar
 
-Este repositório inclui `.github/workflows/pages.yml`. Envie os arquivos do projeto para a branch `main` e selecione **Settings → Pages → Build and deployment → GitHub Actions**. O workflow publica a interface a cada atualização da branch. O endereço fica acessível por navegador em qualquer dispositivo com internet.
+Abra o site pelo endereço HTTPS do GitHub Pages. Para desenvolvimento local, qualquer servidor estático pode servir os arquivos. O workflow de Pages publica atualizações da branch `main`; em **Settings → Pages → Build and deployment**, selecione **GitHub Actions**.
 
-O GitHub Pages hospeda apenas os arquivos estáticos; o banco continua na camada da API Technoworks. O endpoint `https://technoworks.com.br/api/items` respondeu com CORS permitindo `https://p3dr00ks.github.io`, e suporta os métodos usados pelo modo Functions. A API Functions é compartilhada: qualquer visitante que abra o site poderá cadastrar, editar ou excluir registros nessa coleção. Não use esses registros para dados privados.
+O GitHub Pages hospeda os arquivos estáticos; a API Technoworks hospeda os dados. A aplicação requer que a API aceite CORS para a origem do Pages. A coleção é compartilhada e não deve receber dados privados.
+
+## Testes
+
+Execute `npm test` com Node.js para validar normalização de IDs, formatos de resposta, validação de produtos, pesquisa, URLs de imagem e rotas/métodos da API. O workflow de qualidade também executa esses testes em cada push e pull request.
 
 ## Arquitetura
 
 ```text
 Navegador (HTML/CSS/JavaScript)
-        │ REST + JSON / GET via HTTPS
+        │ HTTPS · REST/JSON
         ▼
-GitHub Pages (interface) ───── API Technoworks (Functions | REST | Easy)
+GitHub Pages ───────── API Technoworks (Functions | REST | Easy)
                                       │
                                       ▼
                                   Banco NoSQL
