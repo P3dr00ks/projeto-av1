@@ -1,0 +1,13 @@
+// Fotos ilustrativas dos produtos legados. Novos itens armazenam "imagem" na coleção REST.
+window.VITRINE_IMAGES=Object.freeze({
+  "k7c4DjYL3MxM5Q9U2ZB1":{url:"https://d3gqasl9vmjfd8.cloudfront.net/1fbc8c36-41bf-433e-b07b-8a21f78cd1d1.jpg",source:"https://computers.woot.com/offers/dell-d2421h-24-inch-full-hd-monitor-6"},
+  "FPfmb1afhwfNMUw1wkBn":{url:"https://www.firstshop.co.za/cdn/shop/files/tbs-3101-05-gaming-headsets-1149797295.jpg?v=1742414360",source:"https://www.firstshop.co.za/products/turtle-beach-stealth-700-gen3-playstation-wireless-gaming-headset-black-tbs-3101-05-324358"},
+  "qpENYZ1gA4o9eM0XPYVc":{url:"https://elitehubs.com/cdn/shop/files/Redragon-Mitra-K551-104-Wired-Mechanical-Keyboard-Rgb-Black-Blue-Switch.jpg?v=1685622701&width=533",source:"https://elitehubs.com/products/redragon-mitra-k551-rgb-mechanical-gaming-keyboard-blue-switch"},
+  "SEzB0TO80jBsIthcurIG":{url:"https://images4.kabum.com.br/produtos/fotos/100724/mouse-gamer-havit-rgb-7-botoes-7200dpi-hv-ms1001_1552314713_gg.jpg",source:"https://www.kabum.com.br/produto/100724/mouse-gamer-havit-rgb-7-botoes-4800dpi-hv-ms1001"},
+  "UZceyxXLYLLl9gUJPf77":{url:"https://www.costco.com.mx/medias/sys_master/products/h4b/h3d/398628244652062.jpg",source:"https://www.costco.com.mx/Negro/PlayStation-5-DualSense-Control-Inalambrico-Midnight-Black/p/696161-2"},
+  "VJvU4C9X1OL314xrlK20":{url:"https://images.stockx.com/images/Funko-Pop-Games-Halo-Universe-Master-Chief-Figure-01.jpg?auto=format%2Ccompress&bg=FFFFFF&dpr=2&fit=fill&h=500&q=90&trim=color&updated_at=1620337461&w=700",source:"https://stockx.com/fr-fr/funko-pop-games-halo-universe-master-chief-figure-01"},
+  "cG7yYhfgqlj96hj3zrQq":{url:"https://images2.kabum.com.br/produtos/fotos/385192/console-nintendo-switch-oled-com-joy-con-branco-hbgskaaa2_1663593562_gg.jpg",source:"https://www.kabum.com.br/produto/385192/console-nintendo-switch-oled-com-joy-con-branco"},
+  "1J9mwGtV1gtchEomueoF":{url:"https://cdn.awsli.com.br/800x800/948/948792/produto/71168363/1-9ogq92ybgu.jpg",source:"https://www.izzygames.com.br/console-xbox-series-x-garantia-oficial-microsoft"},
+  "7UhGKyr0p31DQQL1olCK":{url:"https://intercompras.com/images/product/SONY_4948872415934.jpg",source:"https://intercompras.com/p/consola-sony-playstation-slim-1tb-blanco-354307"},
+  "mNAKP5xwC0tewVG9qieG":{url:"https://cdn.awsli.com.br/600x1000/2595/2595093/produto/237971202/1-99874-ebjihm92d5.png",source:"https://www.prosetup.com.br/jogo-the-legend-of-zelda-tears-of-the-kingdom-nintendo-switch"}
+});
